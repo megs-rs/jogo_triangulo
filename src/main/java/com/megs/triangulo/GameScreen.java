@@ -64,7 +64,7 @@ public class GameScreen extends InputAdapter implements Screen {
         fontDado = new BitmapFont();
         fontDado.getData().setScale(2.0f);
 
-        int n = com.badlogic.gdx.math.MathUtils.random(12, 18);
+        int n = com.badlogic.gdx.math.MathUtils.random(5, 8);
         pontos = Ponto.gerarPontos(n, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         linhas = new ArrayList<>();
         triangulos = new ArrayList<>();
@@ -204,12 +204,39 @@ public class GameScreen extends InputAdapter implements Screen {
             boolean tem_ak = existeLinha(a, k);
             boolean tem_bk = existeLinha(b, k);
             if (tem_ak && tem_bk) {
-                if (!trianguloExiste(a, b, k)) {
+                if (!trianguloExiste(a, b, k) && !pontoDentroDoTriangulo(a, b, k)) {
                     triangulos.add(new Triangulo(a, b, k, turnoAtual));
                     placar[turnoAtual]++;
                 }
             }
         }
+    }
+
+    private boolean pontoDentroDoTriangulo(int a, int b, int c) {
+        float ax = pontos[a].x, ay = pontos[a].y;
+        float bx = pontos[b].x, by = pontos[b].y;
+        float cx = pontos[c].x, cy = pontos[c].y;
+        for (int i = 0; i < pontos.length; i++) {
+            if (i == a || i == b || i == c) continue;
+            if (pontoEmTriangulo(pontos[i].x, pontos[i].y, ax, ay, bx, by, cx, cy)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean pontoEmTriangulo(float px, float py,
+                                     float ax, float ay, float bx, float by, float cx, float cy) {
+        float d1 = sinal(px, py, ax, ay, bx, by);
+        float d2 = sinal(px, py, bx, by, cx, cy);
+        float d3 = sinal(px, py, cx, cy, ax, ay);
+        boolean neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+        boolean pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+        return !(neg && pos);
+    }
+
+    private float sinal(float px, float py, float ax, float ay, float bx, float by) {
+        return (px - bx) * (ay - by) - (ax - bx) * (py - by);
     }
 
     private boolean trianguloExiste(int a, int b, int c) {
@@ -228,8 +255,7 @@ public class GameScreen extends InputAdapter implements Screen {
     }
 
     private void checarFimDeJogo() {
-        int totalPossivel = pontos.length * (pontos.length - 1) / 2;
-        if (linhas.size() >= totalPossivel) {
+        if (linhasValidasRestantes() == 0) {
             gameOver = true;
         }
     }
@@ -314,7 +340,9 @@ public class GameScreen extends InputAdapter implements Screen {
 
         if (esperandoDado && !dado.isAnimando() && linhasRestantesTurno == 0 && !gameOver) {
             int restantes = linhasValidasRestantes();
-            if (dado.getValor() > restantes && restantes > 0) {
+            if (restantes == 0) {
+                gameOver = true;
+            } else if (dado.getValor() > restantes) {
                 mensagem = "Vez pulada! (dado " + dado.getValor() + " > " + restantes + " linhas)";
                 mensagemTimer = 2f;
                 proximoTurno();
@@ -360,21 +388,27 @@ public class GameScreen extends InputAdapter implements Screen {
 
         desenharTextosHUD();
 
+        batch.end();
+
         if (mensagemTimer > 0 && !mensagem.isEmpty()) {
             fontMsg.setColor(Color.WHITE);
             GlyphLayout msgLayout = new GlyphLayout(fontMsg, mensagem);
             float msgY = Gdx.graphics.getHeight() / 2f + 80;
+            float msgX = Gdx.graphics.getWidth() / 2f - msgLayout.width / 2f - 15;
+            float msgBgY = msgY - msgLayout.height - 5;
+
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(0, 0, 0, 0.7f);
-            shapeRenderer.rect(
-                Gdx.graphics.getWidth() / 2f - msgLayout.width / 2f - 15,
-                msgY - msgLayout.height - 5,
-                msgLayout.width + 30,
-                msgLayout.height + 15);
+            shapeRenderer.rect(msgX, msgBgY, msgLayout.width + 30, msgLayout.height + 15);
+            shapeRenderer.end();
+
+            batch.begin();
             fontMsg.draw(batch, mensagem,
                 Gdx.graphics.getWidth() / 2f - msgLayout.width / 2f, msgY);
+            batch.end();
         }
-
-        batch.end();
 
         if (gameOver) {
             Gdx.gl.glEnable(GL20.GL_BLEND);

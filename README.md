@@ -13,10 +13,10 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 ## Regras
 
 - **2 jogadores** alternam turnos
-- **12 a 18 pontos** coloridos gerados aleatoriamente
+- **5 a 8 pontos** coloridos gerados aleatoriamente
 - **Dado (1–6)** rola automaticamente no início de cada turno, determina quantas linhas o jogador deve desenhar
-- **Linha** une dois pontos ainda não conectados
-- **Triângulo** = 3 pontos mutuamente conectados → +1 ponto para quem fechou
+- **Linha** une dois pontos ainda não conectados, desde que não cruze outra linha
+- **Triângulo** = 3 pontos mutuamente conectados, sem pontos dentro → +1 ponto para quem fechou
 - **Regra final:** Se o dado for maior que as linhas restantes no jogo → vez pulada
 - **Fim do jogo:** Quando todos os pares de pontos estão conectados
 - **Vitória:** Jogador com mais triângulos

@@ -7,7 +7,7 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 ## Regras
 
 ### Setup
-- 12 a 18 pontos coloridos gerados aleatoriamente na tela (com margem de segurança das bordas)
+- 5 a 8 pontos coloridos gerados aleatoriamente na tela (com margem de segurança das bordas)
 - Distância mínima entre pontos: ~40px
 - Cada ponto tem uma cor vibrante
 
@@ -22,8 +22,9 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 
 ### Detecção de Triângulos
 - Quando uma nova linha é desenhada entre pontos A e B, o jogo verifica se existe um ponto C tal que as linhas A–C e B–C já existem
-- Se sim, o triângulo (A, B, C) é formado
+- Se sim, o triângulo (A, B, C) é formado, **desde que nenhum outro ponto esteja dentro dele**
 - Uma linha pode fechar mais de um triângulo simultaneamente
+- Linhas não podem se cruzar
 
 ### Fim de Jogo
 - O jogo termina quando não há mais linhas possíveis (todos os pares de pontos estão conectados)
