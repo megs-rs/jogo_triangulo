@@ -64,7 +64,7 @@ public class GameScreen extends InputAdapter implements Screen {
         fontDado = new BitmapFont();
         fontDado.getData().setScale(2.0f);
 
-        int n = com.badlogic.gdx.math.MathUtils.random(5, 8);
+        int n = 10;
         pontos = Ponto.gerarPontos(n, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         linhas = new ArrayList<>();
         triangulos = new ArrayList<>();

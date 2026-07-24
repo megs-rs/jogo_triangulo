@@ -7,7 +7,7 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 ## Regras
 
 ### Setup
-- 5 a 8 pontos coloridos gerados aleatoriamente na tela (com margem de segurança das bordas)
+- 10 pontos coloridos gerados aleatoriamente na tela (com margem de segurança das bordas)
 - Distância mínima entre pontos: ~40px
 - Cada ponto tem uma cor vibrante
 
