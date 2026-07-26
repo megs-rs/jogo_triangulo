@@ -3,11 +3,11 @@ package com.megs.triangulo;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 
 public class Ponto {
     public static final float RAIO = 10f;
     public static final float DISTANCIA_MINIMA = 40f;
+    public static final float ALTURA_MINIMA_TRIANGULO = 25f;
 
     public float x, y;
     public Color cor;
@@ -22,12 +22,6 @@ public class Ponto {
         float dx = px - x;
         float dy = py - y;
         return dx * dx + dy * dy <= RAIO * RAIO * 4;
-    }
-
-    public float distancia(Ponto outro) {
-        float dx = x - outro.x;
-        float dy = y - outro.y;
-        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
     public void render(ShapeRenderer sr, boolean selected, boolean hover) {
@@ -67,6 +61,22 @@ public class Ponto {
                     if (dx * dx + dy * dy < DISTANCIA_MINIMA * DISTANCIA_MINIMA) {
                         valido = false;
                         break;
+                    }
+                }
+                if (valido) {
+                    for (int j = 0; j < i; j++) {
+                        for (int k = 0; k < j; k++) {
+                            float lx = pontos[j].x - pontos[k].x;
+                            float ly = pontos[j].y - pontos[k].y;
+                            float len = (float) Math.sqrt(lx * lx + ly * ly);
+                            if (len < 1f) continue;
+                            float h = Math.abs(lx * (pontos[k].y - y) - ly * (pontos[k].x - x)) / len;
+                            if (h < ALTURA_MINIMA_TRIANGULO) {
+                                valido = false;
+                                break;
+                            }
+                        }
+                        if (!valido) break;
                     }
                 }
                 if (valido) {

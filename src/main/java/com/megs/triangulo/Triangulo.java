@@ -1,10 +1,6 @@
 package com.megs.triangulo;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Triangulo {
@@ -39,15 +35,5 @@ public class Triangulo {
             pontos[idxB].x, pontos[idxB].y,
             pontos[idxC].x, pontos[idxC].y
         );
-    }
-
-    public void renderSimbolo(SpriteBatch batch, Ponto[] pontos, BitmapFont font) {
-        float cx = (pontos[idxA].x + pontos[idxB].x + pontos[idxC].x) / 3f;
-        float cy = (pontos[idxA].y + pontos[idxB].y + pontos[idxC].y) / 3f;
-
-        String simbolo = dono == 0 ? "\u2764" : "\u2605";
-        font.setColor(dono == 0 ? Color.WHITE : Color.YELLOW);
-        GlyphLayout layout = new GlyphLayout(font, simbolo);
-        font.draw(batch, simbolo, cx - layout.width / 2f, cy + layout.height / 2f);
     }
 }

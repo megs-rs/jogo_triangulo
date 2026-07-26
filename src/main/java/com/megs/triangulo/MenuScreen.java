@@ -42,6 +42,12 @@ public class MenuScreen implements Screen {
         Label title = new Label("JOGO DOS\nTRIANGULOS", new Label.LabelStyle(titleFont, Color.WHITE));
         title.setAlignment(com.badlogic.gdx.utils.Align.center);
 
+        int hs1 = HighScore.get(0);
+        int hs2 = HighScore.get(1);
+        String hsTexto = "Recorde  J1: " + hs1 + "  |  J2: " + hs2;
+        Label hsLabel = new Label(hsTexto, new Label.LabelStyle(scoreFont, Color.LIGHT_GRAY));
+        hsLabel.setAlignment(com.badlogic.gdx.utils.Align.center);
+
         TextButton startButton = new TextButton("Iniciar", skin);
         startButton.addListener(new ClickListener() {
             @Override
@@ -62,7 +68,8 @@ public class MenuScreen implements Screen {
         table.setFillParent(true);
         table.add(title).padBottom(60).row();
         table.add(startButton).width(200).height(50).padBottom(15).row();
-        table.add(exitButton).width(200).height(50);
+        table.add(exitButton).width(200).height(50).padBottom(40).row();
+        table.add(hsLabel);
 
         stage.addActor(table);
     }

@@ -6,9 +6,14 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 
 ## Regras
 
+### Jogadores
+- **Jogador 1 (J1):** azul
+- **Jogador 2 (J2):** vermelho
+
 ### Setup
 - 10 pontos coloridos gerados aleatoriamente na tela (com margem de segurança das bordas)
 - Distância mínima entre pontos: ~40px
+- Altura mínima entre pontos e retas formadas por pares existentes: ~25px (evita triângulos achatados)
 - Cada ponto tem uma cor vibrante
 
 ### Turno
@@ -34,6 +39,11 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 - Jogador com mais triângulos marcados vence
 - Em caso de empate: ambos ganham
 
+### High Scores
+- Ao finalizar o jogo, as pontuações são comparadas com os recordes salvos
+- Se uma pontuação for maior que o recorde existente, ela é atualizada
+- Os recordes são exibidos na tela inicial
+
 ## Especificação Técnica
 
 ### Stack
@@ -52,12 +62,14 @@ jogo_triangulo/
 ├── gradlew / gradlew.bat
 ├── gradle/wrapper/
 ├── SPEC.md
+├── TODO.md
+├── README.md
 └── src/main/java/com/megs/triangulo/
     ├── TrianguloGame.java          Entry point (extends Game)
     ├── ScreenManager.java          Navegação entre telas
     ├── UiSkin.java                  Skin para botões/labels
     ├── HighScore.java               Persistência de recordes
-    ├── MenuScreen.java              Tela inicial
+    ├── MenuScreen.java              Tela inicial com recordes
     ├── GameScreen.java              Tela principal do jogo
     ├── Ponto.java                   Ponto colorido na tela
     ├── Linha.java                   Linha entre 2 pontos
@@ -77,19 +89,18 @@ jogo_triangulo/
 - Pontos: círculos preenchidos (raio ~10px)
 - Linhas: brancas, espessura 2px
 - Triângulos: preenchimento semi-transparente
-  - Jogador 1: azul + símbolo ❤️ (coração)
-  - Jogador 2: vermelho + símbolo ⭐ (estrela)
+  - Jogador 1: azul
+  - Jogador 2: vermelho
 - Dado: quadrado branco com número preto (canto superior esquerdo)
-- Placar: texto superior "Jogador 1: X | Jogador 2: Y"
-- Indicador de turno: "Vez do Jogador X"
-- Botão "Rolar Dado": retângulo clicável na parte inferior
+- Placar: "J1: X | J2: Y" com cores dos jogadores
+- Indicador de turno: "JOGADOR X" na cor do jogador
+- Tela inicial: exibe recordes "Recorde J1: X | J2: Y"
 
 ### Input
-- `touchDown` / `clicked` via InputProcessor
+- `touchDown` via InputProcessor
 - 1º clique em ponto → seleciona (destaque visual)
 - 2º clique em outro ponto → cria aresta (se válida)
 - Hover: mudar cor do ponto sob o cursor
-- Botão "Rolar Dado": cliquável
 
 ### Modelo de Dados
 
@@ -113,31 +124,33 @@ jogo_triangulo/
 ### Estado do GameScreen
 
 ```
-List<Ponto> pontos          // 12-18 pontos
-List<Linha> linhas          // linhas desenhadas
-List<Triangulo> triangulos  // triângulos formados
-int turnoAtual              // 0 ou 1
-int[] placar                // [pontosJ1, pontosJ2]
+Ponto[] pontos               // 10 pontos
+List<Linha> linhas           // linhas desenhadas
+List<Triangulo> triangulos   // triângulos formados
+int turnoAtual               // 0 ou 1
+int[] placar                 // [pontosJ1, pontosJ2]
 Dado dado
-int linhasRestantesTurno    // quantas linhas o jogador ainda deve desenhar
-boolean esperandoDado       // true = pode rolar, false = desenhando
-boolean turnoPulado         // flag para mensagem de vez pulada
+int linhasRestantesTurno     // quantas linhas o jogador ainda deve desenhar
+boolean esperandoDado        // true = pode rolar, false = desenhando
 boolean gameOver
-Ponto pontoSelecionado      // primeiro ponto clicado (null se nenhum)
+Ponto pontoSelecionado       // primeiro ponto clicado (null se nenhum)
+int linhasValidasCache       // cache de linhas válidas restantes
+boolean linhasValidasDirty   // flag para recalcular cache
 ```
 
 ### Detecção de Triângulos (Algoritmo)
 
 ```java
 // Para nova linha entre pontos i e j:
-for (int k = 0; k < pontos.size(); k++) {
+for (int k = 0; k < pontos.length; k++) {
     if (k == i || k == j) continue;
     boolean tem_ik = existeLinha(i, k);
-    boolean tem_jk = existeLinha(j, k);
-    if (tem_ik && tem_jk) {
-        // Triângulo (i, j, k) formado!
-        adicionarTriangulo(i, j, k, turnoAtual);
-        placar[turnoAtual]++;
+    boolean tem_bk = existeLinha(j, k);
+    if (tem_ik && tem_bk) {
+        if (!trianguloExiste(i, j, k) && !pontoDentroDoTriangulo(i, j, k)) {
+            triangulos.add(new Triangulo(i, j, k, turnoAtual));
+            placar[turnoAtual]++;
+        }
     }
 }
 ```
@@ -145,19 +158,18 @@ for (int k = 0; k < pontos.size(); k++) {
 ### Checagem de Fim de Jogo
 
 ```java
-int totalPossivel = n * (n - 1) / 2;
-if (linhas.size() == totalPossivel) {
+// Usa cache de linhas válidas (evita recálculo a cada frame)
+if (linhasValidasRestantes() == 0) {
     gameOver = true;
 }
 ```
 
-### Regra Final (Die > linhas restantes)
+### Regra Final (Dado > linhas restantes)
 
 ```java
-int totalPossivel = n * (n - 1) / 2;
-int linhasRestantesNoJogo = totalPossivel - linhas.size();
-if (dado.getValor() > linhasRestantesNoJogo) {
-    mostrarMensagem("Vez pulada! (dado > linhas restantes)");
+int restantes = linhasValidasRestantes();
+if (dado.getValor() > restantes) {
+    mostrarMensagem("Vez pulada! (dado " + dado.getValor() + " > " + restantes + " linhas)");
     proximoTurno();
 }
 ```
@@ -165,13 +177,16 @@ if (dado.getValor() > linhasRestantesNoJogo) {
 ### Geração de Pontos
 
 ```java
-int n = MathUtils.random(12, 18);
+int n = 10;
 float margem = 80f;
+float margemTopo = 130f;
 float distanciaMinima = 40f;
+float alturaMinima = 25f;
 // Gerar pontos com:
 // - x: margem .. (largura - margem)
-// - y: margem .. (altura - margem)
+// - y: margemTopo .. (altura - margemTopo)
 // - Verificar distância mínima entre todos os pares
+// - Verificar altura mínima vs retas formadas por pares existentes
 ```
 
 Cores vibrantes: vermelho, azul, verde, amarelo, magenta, ciano, laranja, rosa.
@@ -184,8 +199,6 @@ def gdxVersion = '1.12.1'
 dependencies {
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    runtimeOnly "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 }
 ```

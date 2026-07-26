@@ -16,10 +16,6 @@ public class Linha {
         return (idxA == a && idxB == b) || (idxA == b && idxB == a);
     }
 
-    public boolean envolve(int indice) {
-        return idxA == indice || idxB == indice;
-    }
-
     public void render(ShapeRenderer sr, Ponto[] pontos) {
         sr.setColor(Color.WHITE);
         sr.line(pontos[idxA].x, pontos[idxA].y, pontos[idxB].x, pontos[idxB].y);

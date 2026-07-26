@@ -4,7 +4,7 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 
 ## Como Jogar
 
-1. **Dado rola automaticamente** — O valor (1–6) aparece no canto superior
+1. **Dado rola automaticamente** — O valor (1–6) aparece no canto superior esquerdo
 2. **Desenhar Linhas** — Clique-clique em dois pontos diferentes para conectar com uma linha
 3. **Fechar Triângulos** — Quando uma linha fecha um triângulo, você marca 1 ponto
 4. **Repetir** — Desenhe exatamente a quantidade de linhas indicada pelo dado
@@ -12,7 +12,7 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 
 ## Regras
 
-- **2 jogadores** alternam turnos
+- **2 jogadores** alternam turnos (J1 = azul, J2 = vermelho)
 - **10 pontos** coloridos gerados aleatoriamente
 - **Dado (1–6)** rola automaticamente no início de cada turno, determina quantas linhas o jogador deve desenhar
 - **Linha** une dois pontos ainda não conectados, desde que não cruze outra linha
@@ -20,6 +20,7 @@ Jogo de tabuleiro digital para 2 jogadores. Pontos coloridos são distribuídos 
 - **Regra final:** Se o dado for maior que as linhas restantes no jogo → vez pulada
 - **Fim do jogo:** Quando todos os pares de pontos estão conectados
 - **Vitória:** Jogador com mais triângulos
+- **Recorde:** Melhor pontuação de cada jogador é salva e exibida na tela inicial
 
 ## Como Rodar
 
@@ -44,7 +45,7 @@ src/main/java/com/megs/triangulo/
 ├── TrianguloGame.java      Entry point
 ├── ScreenManager.java      Navegação entre telas
 ├── GameScreen.java          Lógica principal do jogo
-├── MenuScreen.java          Tela inicial
+├── MenuScreen.java          Tela inicial com recordes
 ├── Ponto.java               Ponto colorido
 ├── Linha.java               Aresta entre pontos
 ├── Triangulo.java           Triângulo formado

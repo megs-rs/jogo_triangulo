@@ -299,12 +299,22 @@ public class GameScreen extends InputAdapter implements Screen {
             Gdx.graphics.getWidth() / 2f - turnoLayout.width / 2f,
             hudTop - 15);
 
-        String placarTexto = "J1: " + placar[0] + "  |  J2: " + placar[1];
+        float placarX = Gdx.graphics.getWidth() - 30;
+        String placarJ1 = "J1: " + placar[0];
+        String placarSep = "  |  ";
+        String placarJ2 = "J2: " + placar[1];
+        GlyphLayout j2Layout = new GlyphLayout(fontInfo, placarJ2);
+        GlyphLayout sepLayout = new GlyphLayout(fontInfo, placarSep);
+        GlyphLayout j1Layout = new GlyphLayout(fontInfo, placarJ1);
+        float j2X = placarX - j2Layout.width;
+        float sepX = j2X - sepLayout.width;
+        float j1X = sepX - j1Layout.width;
+        fontInfo.setColor(new Color(0.3f, 0.9f, 1f, 1f));
+        fontInfo.draw(batch, placarJ1, j1X, hudTop - 18);
         fontInfo.setColor(Color.WHITE);
-        GlyphLayout placarLayout = new GlyphLayout(fontInfo, placarTexto);
-        fontInfo.draw(batch, placarTexto,
-            Gdx.graphics.getWidth() - placarLayout.width - 30,
-            hudTop - 18);
+        fontInfo.draw(batch, placarSep, sepX, hudTop - 18);
+        fontInfo.setColor(new Color(1f, 0.3f, 0.3f, 1f));
+        fontInfo.draw(batch, placarJ2, j2X, hudTop - 18);
 
         String restantesTexto = "Linhas validas: " + linhasValidasRestantes();
         fontInfo.setColor(new Color(0.5f, 0.8f, 0.5f, 1f));
@@ -419,18 +429,22 @@ public class GameScreen extends InputAdapter implements Screen {
             shapeRenderer.end();
 
             String vencedor;
+            Color corVencedor;
             if (placar[0] > placar[1]) {
                 vencedor = "JOGADOR 1 VENCEU!";
+                corVencedor = new Color(0.3f, 0.9f, 1f, 1f);
             } else if (placar[1] > placar[0]) {
                 vencedor = "JOGADOR 2 VENCEU!";
+                corVencedor = new Color(1f, 0.3f, 0.3f, 1f);
             } else {
                 vencedor = "EMPATE!";
+                corVencedor = Color.YELLOW;
             }
 
             batch.begin();
 
             GlyphLayout goLayout = new GlyphLayout(fontGrande, vencedor);
-            fontGrande.setColor(Color.YELLOW);
+            fontGrande.setColor(corVencedor);
             fontGrande.draw(batch, vencedor,
                 Gdx.graphics.getWidth() / 2f - goLayout.width / 2f,
                 Gdx.graphics.getHeight() / 2f + goLayout.height / 2f + 50);
