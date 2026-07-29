@@ -1,7 +1,6 @@
 # Gradle
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -30,3 +29,4 @@ ehthumbs.db
 *.tmp
 *.bak
 *~
+!gradle/wrapper/gradle-wrapper.jar
